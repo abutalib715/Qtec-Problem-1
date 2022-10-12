@@ -3,83 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\SearchHistory;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SearchHistoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    function initializeFiltersData(){
+        $keywords = SearchHistory::select('keyword',DB::raw('COUNT(keyword) as count'))->groupBy('keyword')->get();
+        $users = User::all();
+        $ip_addresses = SearchHistory::select('ip_address')->groupBy('ip_address')->get();
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\SearchHistory  $searchHistory
-     * @return \Illuminate\Http\Response
-     */
-    public function show(SearchHistory $searchHistory)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\SearchHistory  $searchHistory
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(SearchHistory $searchHistory)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\SearchHistory  $searchHistory
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, SearchHistory $searchHistory)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\SearchHistory  $searchHistory
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(SearchHistory $searchHistory)
-    {
-        //
+        return response()->json(['keywords' => $keywords, 'users' => $users, 'ip_addresses' => $ip_addresses]);
     }
 }
