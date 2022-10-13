@@ -18,3 +18,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/initialize-filters-data', [SearchHistoryController::class, 'initializeFiltersData']);
+Route::get('/filter-search-history', [SearchHistoryController::class, 'index']);

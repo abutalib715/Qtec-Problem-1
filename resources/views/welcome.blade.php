@@ -12,9 +12,8 @@
 </head>
 <body>
     <div id="app">
-
         <nav class="navbar navbar-dark bg-dark">
-            <h1 class="text-center">FILTER SEARCH HISTORY</h1>
+            <h1 style="margin: 0 auto; color: #ddd;">FILTER SEARCH HISTORY</h1>
         </nav>
         <div class="container-fluid">
             <div class="card mb-3">
@@ -22,6 +21,7 @@
 
                     <div class="col-md-4">
                         <div class="card-header">
+                            <button class="btn btn-outline-danger" @click="clearFilter">CLEAR FILTER</button>
                             <div>
                                 <h4>Time Range</h4>
                                 <input class="form-check-input" type="radio" v-model="form.time_range"
@@ -47,7 +47,7 @@
                                 <span v-for="keyword in keywords" style="margin-right: 10px;">
                                     <input class="form-check-input" type="checkbox" v-model="form.keywords"
                                            :value="keyword.keyword" :id="keyword.keyword" style="margin-right: 5px;">
-                                    <label class="form-check-label" :for="keyword.keyword"> @{{ keyword.keyword }}</label>
+                                    <label class="form-check-label" :for="keyword.keyword"> @{{ keyword.keyword }} (@{{ keyword.count }} times found)</label>
                                 </span>
                             </div>
                             <div>
@@ -79,15 +79,17 @@
                                     <th scope="col">Search Result</th>
                                     <th scope="col">User</th>
                                     <th scope="col">IP</th>
+                                    <th scope="col">Time</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>@mdo</td>
-                                    <td>@mdo</td>
+                                <tr v-for="(result,index) in filter_results">
+                                    <th scope="row">@{{ ++index }}</th>
+                                    <td>@{{ result.keyword }}</td>
+                                    <td>@{{ result.search_results }}</td>
+                                    <td>@{{ result.user.name }}</td>
+                                    <td>@{{ result.ip_address }}</td>
+                                    <td>@{{ result.entry_time }}</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -126,10 +128,14 @@
             },
             mounted(){
                 this.initializeFiltersData();
+                this.filterSearchHistory();
             },
             watch: {
-                form: function(){
-
+                form: {
+                    handler() {
+                        this.filterSearchHistory();
+                    },
+                    deep: true
                 }
             },
             methods: {
@@ -144,6 +150,27 @@
                             console.log(error);
                         });
                 },
+                filterSearchHistory: function (){
+                    axios.get('/filter-search-history', {
+                        params: this.form
+                    })
+                    .then((response) => {
+                        this.filter_results = response.data.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                },
+                clearFilter: function (){
+                    this.form = {
+                        keywords: [],
+                        users: [],
+                        ip_addresses: [],
+                        start_date:'',
+                        end_date: '',
+                        time_range: ''
+                    }
+                }
             }
         }).mount('#app')
     </script>
